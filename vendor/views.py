@@ -13,11 +13,9 @@ from .models import *
 
 # Create your views here.
 
-
-
-def adminlogin(request):
+def admin_login(request):
     if request.session.has_key('username'):
-        return redirect(admindashboard)
+        return redirect(admin_dashboard)
 
     if request.method == 'POST':
         user = request.POST['username']
@@ -37,16 +35,16 @@ def adminlogin(request):
             return redirect("adminlogin")
         if user=='admin' and password=='admin':
             request.session['username'] = user
-            return redirect(admindashboard) 
+            return redirect(admin_dashboard) 
 
         else:
             messages.info(request,'invalid credentials')
-            return redirect(adminlogin)
+            return redirect(admin_login)
     else:
         return render(request, 'vendor/adminloginpage.html')
 
 
-def admindashboard(request):
+def admin_dashboard(request):
     if request.session.has_key('username'):
         users = User.objects.filter(is_superuser=False)
         products = Product.objects.all()
@@ -57,21 +55,21 @@ def admindashboard(request):
         context = {'length_user':length_user,'length_products':length_products,'length_orderitem':length_orderitem}
         return render(request, 'vendor/admindashboard.html',context)
     else:
-        return redirect(adminlogin)
+        return redirect(admin_login)
 
 
-def adminlogout(request):
+def admin_logout(request):
     request.session.flush()
-    return redirect(adminlogin) 
+    return redirect(admin_login) 
 
 #ManageUSers
 
-def manageusers(request):
+def manage_users(request):
     if request.session.has_key('username'):
         users = User.objects.filter(is_superuser=False)
         return render(request, 'vendor/manageusers.html',{'users':users})
     else:
-        return redirect(adminlogin)
+        return redirect(admin_login)
 
 
 def createuser(request):
@@ -98,258 +96,214 @@ def createuser(request):
                         user = User.objects.create_user(first_name=firstname,last_name=lastname,username=username,email=email,password=password)
                         user.save()
                         messages.info(request,'User Created') 
-                        return redirect(admindashboard)
+                        return redirect(manage_users)
                 else:
                     messages.info(request,'Password Not Matching')    
                     return render(request,'vendor/createuser.html',dic)
             else:               
                 return render(request,'vendor/createuser.html')
         else:
-            return redirect(adminlogin)
+            return redirect(admin_login)
 
 
-def updateuser(request, id):
+def update_user(request, id):
     if request.session.has_key('username'):
         if request.method == 'POST':
-            firstname = request.POST['firstname']
-            lastname = request.POST['lastname']
+            first_name = request.POST['firstname']
+            last_name = request.POST['lastname']
             username = request.POST['username']
             email = request.POST['email']
 
-            z = User.objects.get(id=id)
-            z.first_name = firstname
-            z.last_name = lastname
-            z.username = username
-            z.email = email
-            z.save()
-            return redirect(admindashboard)  
+            user_data = User.objects.get(id=id)
+            user_data.first_name = first_name
+            user_data.last_name = last_name
+            user_data.username = username
+            user_data.email = email
+            user_data.save()
+            return redirect(manage_users)  
         else:
             return render(request, 'vendor/updateuser.html')
     else:
-        redirect(adminlogin)
+        redirect(admin_login)
 
-
-def edituser(request, id):
+def edit_user(request, id):
     if request.session.has_key('username'):
         con = User.objects.get(id=id)
         return render(request, 'vendor/updateuser.html',{"con":con})
     else:
-        return redirect(adminlogin)
+        return redirect(admin_login)
 
-
-def deleteuser(request,id):
+def delete_user(request,id):
     if request.session.has_key('username'):
         u=User.objects.get(id=id)
         u.delete()
-        return redirect(admindashboard)
+        return redirect(manage_users)
     else:
-        return redirect(adminlogin)
+        return redirect(admin_login)
 
-def blockuser(request,id):
+def block_user(request,id):
     if request.session.has_key('username'):
         u=User.objects.get(id=id)
         u.is_active = False
         print(u.is_active)
         u.save()
-        return redirect(manageusers)
+        return redirect(manage_users)
     else:
-        return redirect(adminlogin)
+        return redirect(admin_login)
 
-def activateuser(request,id):
+def activate_user(request,id):
     if request.session.has_key('username'):
         u=User.objects.get(id=id)
         u.is_active = True
         print(u.is_active)
         u.save()
-        return redirect(manageusers)
+        return redirect(manage_users)
     else:
-        return redirect(adminlogin)
-
+        return redirect(admin_login)
 
 #ManageProducts
 
-def manageproduct(request):
+def manage_product(request):
     if request.session.has_key('username'):
         products = Product.objects.all()
         return render(request, 'vendor/manageproduct.html',{'products':products})
     else:
-        return redirect(adminlogin)
+        return redirect(admin_login)
 
 
-def createproduct(request):
+def create_product(request):
     if request.session.has_key('username'):
         if request.method == 'POST':
             productname = request.POST['productname']
             price = request.POST['price']
             stock = request.POST['stock']
             description = request.POST['description']
-            # image = request.FILES['image']
             image = request.POST['pro_img']
             category = Category.objects.get(id=request.POST['category'])
-
             format, imgstr = image.split(';base64,')
             ext = format.split('/')[-1]
-
             data = ContentFile(base64.b64decode(imgstr), name=request.user.username + '.' + ext)
-
-
-            j = Product.objects.create(productname=productname,price=price,stock=stock,description=description,category=category,image=data)
-            j.save()
+            product_data = Product.objects.create(productname=productname,price=price,stock=stock,description=description,category=category,image=data)
+            product_data.save()
             messages.info(request,'Product Created')
-            return redirect(manageproduct)
+            return redirect(manage_product)
         else:
             category = Category.objects.all()            
             return render(request,'vendor/createproduct.html',{'category':category})
     else:
-        return redirect(adminlogin)
+        return redirect(admin_login)
 
-
-
-def editproduct(request, id):
+def edit_product(request, id):
     if request.session.has_key('username'):
         con = Product.objects.get(id=id)
         category = Category.objects.all() 
         return render(request, 'vendor/updateproduct.html',{"con":con, 'category':category})
     else:
-        return redirect(adminlogin)
+        return redirect(admin_login)
 
-def updateproduct(request, id):
+def update_product(request, id):
     if request.session.has_key('username'):
         if request.method == 'POST':
             productname = request.POST['productname']
             price = request.POST['price']
             stock = request.POST['stock']
-            # image = request.FILES['image']
             image = request.POST['pro_img']
             description = request.POST['description']
             category = Category.objects.get(id=request.POST['category'])
-
             format, imgstr = image.split(';base64,')
             ext = format.split('/')[-1]
-
             data = ContentFile(base64.b64decode(imgstr), name=request.user.username + '.' + ext)
 
-            z = Product.objects.get(id=id)
+            product_data = Product.objects.get(id=id)
             
-            z.productname = productname
-            z.price = price
-            z.stock = stock
-            z.image = data
-            z.description = description
-            z.category = category
-            z.save()
-            return redirect(admindashboard)  
+            product_data.productname = productname
+            product_data.price = price
+            product_data.stock = stock
+            product_data.image = data
+            product_data.description = description
+            product_data.category = category
+            product_data.save()
+            return redirect(admin_dashboard)  
         else:
             return render(request, 'vendor/updateproduct.html')
     else:
-        redirect(adminlogin)
+        redirect(admin_login)
 
-
-def deleteproduct(request,id):
+def delete_product(request,id):
     if request.session.has_key('username'):
         u = Product.objects.get(id=id)
         u.delete()
-        return redirect(manageproduct)
+        return redirect(manage_product)
     else:
-        return redirect(adminlogin)
+        return redirect(admin_login)
 
-def managecategory(request):
+def manage_category(request):
     if request.session.has_key('username'):
         category = Category.objects.all()
 
         return render(request, 'vendor/managecategory.html',{'category':category})
     else:
-        return redirect(adminlogin)
+        return redirect(admin_login)
 
-def createcategory(request):
+def create_category(request):
     if request.session.has_key('username'):
         if request.method == 'POST':
             categories = request.POST['category']
             category = Category.objects.create(categoryname=categories)
             messages.info(request,'Category Created')
-            return redirect(managecategory)
+            return redirect(manage_category)
         else:               
             return render(request,'vendor/createcategory.html')
     else:
-        return redirect(adminlogin)
+        return redirect(admin_login)
 
-
-def editcategory(request, id):
+def edit_category(request, id):
     if request.session.has_key('username'):
         con = Category.objects.get(id=id)
         return render(request, 'vendor/updatecategory.html',{"con":con})
     else:
-        return redirect(adminlogin)
+        return redirect(admin_login)
 
-
-
-def updatecategory(request, id):
+def update_category(request, id):
     if request.session.has_key('username'):
         if request.method == 'POST':
             category = request.POST['category']
             image = request.FILES['image']
 
-            z = Category.objects.get(id=id)
-            z.categoryname = category
-            z.categoryimage = image
-            z.image = image
-            z.save()
-            return redirect(managecategory)  
+            category_data = Category.objects.get(id=id)
+            category_data.categoryname = category
+            category_data.categoryimage = image
+            category_data.image = image
+            category_data.save()
+            return redirect(manage_category)  
         else:
             return render(request, 'vendor/updatecategory.html')
     else:
-        redirect(adminlogin)
+        redirect(admin_login)
 
-
-def deletecategory(request,id):
+def delete_category(request,id):
     if request.session.has_key('username'):
         u = Category.objects.get(id=id)
         u.delete()
-        return redirect(managecategory)
+        return redirect(manage_category)
     else:
-        return redirect(adminlogin)
+        return redirect(admin_login)
+
 #manage Orders
-
-def manageorders(request):
+def manage_orders(request):
     orders = Order.objects.filter(complete=True)
-    # adress=orders.shippingaddress_set.all()
-    # print("hello",adress)
-    # dic={}
-    # for order in orders:
-    #     print(order)
-    #     try:
-    #         adress=ShippingAddress.objects.get(order=order)
-    #         print("hhhe",adress)
-    #         dic[order.id]=adress.
-
-    #     except:
-    #         pass
-   
-    # print("hello",dic)
-
-    # print(order)
     context = {'orders':orders}
     return render(request, 'vendor/manageorder.html',context)
 
-def pendingorder(request,id,value):
+def pending_order(request,id,value):
     order = Order.objects.get(id=id)
     order.status = value
     order.save()
-    print(order.status)
     orders = Order.objects.filter(complete=True)
     context = {'orders':orders}
     return render(request, 'vendor/manageorder.html',context)
 
-def completeorder(request,id,value):
-    orders = Order.objects.filter(complete=True)
-    order = Order.objects.get(id=id)
-    order.status = value
-    order.save()
-
-    context = {'orders':orders}
-    return render(request, 'vendor/manageorder.html',context)
-
-def cancelorder(request,id,value):
+def complete_order(request,id,value):
     orders = Order.objects.filter(complete=True)
     order = Order.objects.get(id=id)
     order.status = value
@@ -357,35 +311,38 @@ def cancelorder(request,id,value):
     context = {'orders':orders}
     return render(request, 'vendor/manageorder.html',context)
 
-    
+def cancel_order(request,id,value):
+    orders = Order.objects.filter(complete=True)
+    order = Order.objects.get(id=id)
+    order.status = value
+    order.save()
+    context = {'orders':orders}
+    return render(request, 'vendor/manageorder.html',context)
 
 def report(request):
     if request.method == 'POST':
         start_date = request.POST['start_date']
         end_date = request.POST['end_date']
-        print(start_date)
-        print(end_date)
         complete =  Order.objects.filter(date_ordered__range=[start_date, end_date], status='complete').count()
         pending = Order.objects.filter(date_ordered__range=[start_date, end_date], status='pending').count()
         canceled = Order.objects.filter(status='cancelled').count()
-        print(canceled)
-        return render(request, 'vendor/report.html', {'complete':complete,'pending':pending,'canceled':canceled})
+        context =  {'complete':complete,'pending':pending,'canceled':canceled}
+        return render(request, 'vendor/report.html',context)
     else:
         return render(request, 'vendor/report.html')
 
-def salesreport(request):
+def sales_report(request):
     if request.method == 'POST':
         start_date = request.POST['start_date']
         end_date = request.POST['end_date']
         lists = []
         orders = Order.objects.filter(date_ordered__range=[start_date, end_date], status='complete')
-
         context = {'orders':orders}
         return render(request, 'vendor/salesreport.html',context)
     else:
         return render(request, 'vendor/salesreport.html')
 
-def cancelreport(request):
+def cancel_report(request):
     if request.method == 'POST':
         start_date = request.POST['start_date']
         end_date = request.POST['end_date']
