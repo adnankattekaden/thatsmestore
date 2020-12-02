@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <title>Chart Js</title>
+</head>
+
+<body>
+
+    <div class="container">
+        <canvas id="myChart"></canvas>
+    </div>
+
+    <script>
+        let myChart = document.getElementById('myChart').getContext('2d');
+
+        // Global Propeties
+        Chart.defaults.global.defaultFontFamily='Lato';
+        Chart.defaults.global.defaultFontSize=19;
+        Chart.defaults.global.defaultFontColor='hotpink';
+
+
+        let massPopChart = new Chart(myChart, {
+            type: 'line',
+            data: {
+                labels: ['Boston', 'Worcester', 'Springfield', 'Lowell', 'Cambridge', 'New Bedford'],
+                datasets: [{
+                    label: 'Population',
+                    data: [
+                        617594,
+                        181045,
+                        153060,
+                        106519,
+                        105162,
+                        95072,
+                        ],
+                    label: 'Population',
+                    backgroundColor:[
+                    '#000',
+                    'green',
+                    'blue',
+                    'red',
+                    'orange',
+                    'hotpink'
+                    ],
+                    borderWidth:1,
+                    borderColor:'red',
+                    hoverBorderWidth:3,
+                    hoverBorderColor:'yellow'
+                }]
+            },
+            options: {
+                title:{
+                    display:true,
+                    text:'Largest Cities In Massacheutes',
+                    fontSize:25,
+                },
+                legend:{
+                    display:true,
+                    position:'right',
+                    labels:{
+                        fontColor:'green',
+                    }
+                },
+                layout:{
+                    padding:{
+                        left:50,
+                        right:0,
+                        bottom:0,
+                        top:0,
+                    }
+                },
+                tooltips:{
+                    mode:'index',
+                    axis:'X'
+
+                }
+            }
+        });
+
+
+    </script>
+</body>
+
+</html>

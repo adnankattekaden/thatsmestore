@@ -1,0 +1,139 @@
+{% extends 'user/base.html' %}
+{% load static %}
+{% block content %}
+
+<div style="float: right;" class="col-lg-5">
+
+
+    <div class="user-img">
+        <img src="{{img.ImageURL}}" alt="">
+    </div>
+
+    <div class="box-2">
+        <div class="result"></div>
+    </div>
+
+    <button style="right: auto;" type="button" id="load" class="btn save btn-primary">Save changes</button>
+
+</div>
+
+
+
+
+<div style="float: left;" class="col-lg-7">
+    <div class="form-inpts checout-address-step">
+
+        <form method="POST" enctype="multipart/form-data" action="/updated/{{con.id}}">
+
+            {% csrf_token %}
+
+            <div class="msg">
+                {% for i in messages %}
+                <h4 style="text-align: center; color: red;">
+                    {{i}}</h4>
+                {% endfor %}
+            </div>
+
+            <div class="form-group">
+                <input type="text" class="form-control" id="name" name="firstname" placeholder="First Name"
+                    value="{{con.first_name}}" required>
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control" id="name" name="lastname" placeholder="Last Name"
+                    value="{{con.last_name}}" required>
+            </div>
+
+            <div class="form-group">
+                <input type="username" class="form-control" id="username" name="username" placeholder="Username"
+                    value="{{con.username}}" required>
+            </div>
+
+            <div class="form-group">
+                <input type="email" class="form-control" id="email" name="email" placeholder="Email"
+                    value="{{con.email}}" required>
+            </div>
+
+            <!-- <div class="form-group">
+                <input type="file" class="form-control" id="password" name="image" placeholder="image">
+             </div> -->
+
+            <!-- button for adding img -->
+            <div class="input-group form-group">
+                <button type="button" class="btn btn-primary" id="img-button">Upload Image</button>
+            </div>
+
+            <!-- result of cropped img -->
+            <img id="cropped" class="cropped" src="">
+
+            <!-- hidden field -->
+            <input class="d-none" type="file" id="file-input">
+            <textarea name="pro_img" class="d-none" id="imageBaseData"></textarea>
+
+            <button class="login-btn hover-btn" type="submit">Update</button>
+        </form>
+    </div>
+
+
+    <div class="box-2">
+        <div class="result"></div>
+    </div>
+
+
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/0.8.1/cropper.min.js"></script>
+
+    <script>
+
+        $("#img-button").click(function (e) {
+            $("#file-input").click();
+        });
+
+        let result = document.querySelector('.result'),
+            save = document.querySelector('.save'),
+            cropped = document.querySelector('.cropped'),
+            upload = document.querySelector('#file-input'),
+            cropper = '';
+
+        upload.addEventListener('change', (e) => {
+            if (e.target.files.length) {
+                // start file reader
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    if (e.target.result) {
+                        // create new image
+                        // $("#exampleModalCenter").modal("show");
+                        let img = document.createElement('img');
+                        img.id = 'image';
+                        img.src = e.target.result
+                        // clean result before
+                        result.innerHTML = '';
+                        // append new image
+                        result.appendChild(img);
+                        // init cropper
+                        cropper = new Cropper(img);
+                    }
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+
+        save.addEventListener('click', (e) => {
+            e.preventDefault();
+            // get result to data uri
+            let imgSrc = cropper.getCroppedCanvas({
+                width: 300 // img disp value
+            }).toDataURL();
+            // $("#exampleModalCenter").modal("hide");
+            cropped.src = imgSrc;
+            $('#imageBaseData').val(imgSrc)
+        });
+
+    </script>
+
+
+</div>
+
+
+
+{% endblock content %}

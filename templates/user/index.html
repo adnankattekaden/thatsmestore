@@ -1,0 +1,82 @@
+{% extends 'user/base.html' %}
+{% load static %}
+{% block content %}
+
+
+<!-- Categories Start -->
+<div class="section145">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="main-title-tt">
+                    <div class="main-title-left">
+                        <span>Shop By</span>
+                        <h2>Categories</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="owl-carousel cate-slider owl-theme">
+                {% for i in category %}
+                    <div class="item">
+                        <a href="/category/{{i.id}}" class="category-item">
+                            <!-- <div class="cate-img">
+                                <img src="{{i.categoryimage}}" alt="">
+                            </div>
+                             -->
+                            <h4>{{i.categoryname}}</h4>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Categories End -->
+
+<!-- Featured Products Start -->
+
+
+
+<div class="section145">
+    <div class="container">
+        <div class="row">
+
+            <div class="col-md-12">
+                <div class="main-title-tt">
+                    <div class="main-title-left">
+                        <span>For You</span>
+                        <h2>Top Featured Products</h2>
+                    </div>
+                    <a href="#" class="see-more-btn">See All</a>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="owl-carousel featured-slider owl-theme">
+                    {% for product in products %}
+                    <div class="product-item mb-30">
+                        <a href="{% url 'productview' product.id %}" class="product-img">
+                            <img src="{{product.image.url}}" alt="">
+                        </a>
+                        <div class="product-text-dt">
+                            <p>Available<span>(In Stock)</span></p>
+                            <h4>{{product.productname}}</h4>
+                            <div class="product-price">${{product.price|floatformat:2}}</div>
+                            <div>
+                                <button data-product="{{product.id}}" data-action="add" style="float: left;" class="btn btn-outline-secondary add-btn update-cart">Add To Cart</button>
+                                <a class="btn btn-outline-success" href="{% url 'productview' product.id %}">View</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Featured Products End -->
+
+</div>
+
+{% endblock content %}

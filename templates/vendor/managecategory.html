@@ -1,0 +1,38 @@
+{% extends 'vendor/base.html' %}
+{% load static %}
+{% block content %}
+
+<div>
+      <a href="{% url 'createcategory' %}"><input type="button" class="btn btn-info float-right mr-3 mb-3"
+        value="Create Category"></a>
+</div>
+
+
+
+<table class="table">
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Category</th>
+      <th scope="col">NO: OF PRODUCTS</th>
+      <th scope="col">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for i in category %}
+    <tr>
+      <th scope="row">{{i.id}}</th>
+      <td>{{i.categoryname}}</td>
+      <td></td>
+      <td><a href="{% url 'editcategory' i.id %}"><input type="button" class="btn btn-info"
+        value="edit"></a>&nbsp;&nbsp;<a href="{% url 'deletecategory' i.id %}"><input type="button"
+        class="btn btn-primary" onclick="return confirm('Are You Sure Want To Delete')" value="Delete"></td></a>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+
+
+
+{% endblock content %}

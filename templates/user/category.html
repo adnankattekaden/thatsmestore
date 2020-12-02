@@ -1,0 +1,53 @@
+{% extends 'user/base.html' %}
+{% load static %}
+{% block content %}
+
+    <!-- myy -->
+    <div class="all-product-grid">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="product-top-dt">
+                        <div class="product-left-title">
+                        
+                            <h2>{{category.categoryname}}</h2>
+                            
+                        </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-list-view">
+                <div class="row">
+                    {% for product in product %}
+                    <div class="col-lg-3 col-md-6">
+                        <div class="product-item mb-30">
+                            <a href="#" class="product-img">
+                                <img src="{{product.image.url}}" alt="">
+                            </a>
+                            <div class="product-text-dt">
+                                <p>Available<span>(In Stock)</span></p>
+                                <h4>{{product.productname}}</h4>
+                                <div class="product-price">${{product.price|floatformat:2}}</div>
+                                <div>
+                                    <button data-product="{{product.id}}" data-action="add" style="float: left;" class="btn btn-outline-secondary add-btn update-cart">Add To Cart</button>
+                                    <a class="btn btn-outline-success" href="{% url 'productview' product.id %}">View</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <div class="col-md-12">
+                        <div class="more-product-btn">
+                            <button class="show-more-btn hover-btn" onclick="window.location.href = '#';">Show More</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
