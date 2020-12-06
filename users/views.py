@@ -317,13 +317,11 @@ def update_profile(request, id):
 def order_history(request):
     user = request.user
     orders = Order.objects.filter(user=user, complete=True)
-    
     # for order in orders:
     #     orderItems = OrderItem.objects.filter(order=order)
     #     for orderItem in orderItems:
     #         items.append(orderItem)   
     context = {'orders':orders}
-
     return render(request, 'user/orderhistory.html',context)
 
 def my_address(request):
