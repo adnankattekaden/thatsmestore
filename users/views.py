@@ -4,12 +4,10 @@ from django.shortcuts import HttpResponse, redirect, render
 from django.http import JsonResponse
 import json
 import datetime
-from vendor.models import Product, Userdetails,Order,OrderItem,ShippingAddress,Category
+from vendor.models import Product,Userdetails,Order,OrderItem,ShippingAddress,Category
 import razorpay
 from django.views.decorators.csrf import csrf_exempt
 import requests
-
-
 import base64
 from django.core.files.base import ContentFile
 #starts 
@@ -197,7 +195,7 @@ def checkout(request):
         order, created = Order.objects.get_or_create(user=user, complete=False)
         items = order.orderitem_set.all()
         cartitems = order.get_cart_items
-        ship = ShippingAddress.objects.filter(user=user)
+        ship = ShippingAddress.objects.filter(user=user).distinct('address')
         client = razorpay.Client(auth=("rzp_test_P9QI5lhnHOuMk7", "42Vsw0omw3ZbXYbROCoF7SYt"))
         order_amount =  float(order.get_cart_total)
         order_amount *= 100
@@ -246,13 +244,10 @@ def process_order(request):
         if total == order.get_cart_total:
             order.complete = True
         order.save() 
-        ad=data['shipping']['address']
-        
-        if ShippingAddress.objects.filter(user=user,address=ad).exists():
-            add = 'addressnotsaved'
-        else:
-            ShippingAddress.objects.create(user=user,order=order,address=data['shipping']['address'],city=data['shipping']['city'],state=data['shipping']['state'],zipcode=data['shipping']['zipcode'],country=data['shipping']['country'],payment_status=data['shipping']['payment_status'])
-            add = 'itemsaved'
+
+        ShippingAddress.objects.create(user=user,order=order,address=data['shipping']['address'],city=data['shipping']['city'],state=data['shipping']['state'],zipcode=data['shipping']['zipcode'],country=data['shipping']['country'],payment_status=data['shipping']['payment_status'])
+        add = 'itemsaved'
+       
     else:
         print('user not logged in')
     return JsonResponse(add, safe=False)
@@ -322,12 +317,13 @@ def update_profile(request, id):
 def order_history(request):
     user = request.user
     orders = Order.objects.filter(user=user, complete=True)
-    items = []
-    for order in orders:
-        orderItems = OrderItem.objects.filter(order=order)
-        for orderItem in orderItems:
-            items.append(orderItem)   
-    context = {'items':items, 'orderItems':orderItems,'orders':orders}
+    
+    # for order in orders:
+    #     orderItems = OrderItem.objects.filter(order=order)
+    #     for orderItem in orderItems:
+    #         items.append(orderItem)   
+    context = {'orders':orders}
+
     return render(request, 'user/orderhistory.html',context)
 
 def my_address(request):

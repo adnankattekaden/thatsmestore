@@ -378,14 +378,11 @@
             .then((data) => {
 
                 console.log('sucess', data)
-                if (data == 'addressnotsaved') {
-                    alert('address Already Exists')
-                }
-                else {
+                if (data) {
                     alert('Transaction Completed')
                     window.location.href = "{% url 'store' %}"
                 }
-
+                
             })
 
     }

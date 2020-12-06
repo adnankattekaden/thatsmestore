@@ -10,6 +10,7 @@ from django.core.files.base import ContentFile
 from django.shortcuts import HttpResponse, redirect, render
 
 from .models import *
+from django.db.models import Sum
 
 # Create your views here.
 
@@ -20,23 +21,18 @@ def admin_login(request):
     if request.method == 'POST':
         user = request.POST['username']
         password = request.POST['password']
-        print(user)
-        print(password)
         recaptcha_response = request.POST.get('g-recaptcha-response')
-        print(recaptcha_response)
         url = 'https://www.google.com/recaptcha/api/siteverify'
         cap_secret="6LdggOwZAAAAAIgOyrSNRpOYLISII4ADvG1_5ydO"
         cap_data = {"secret":cap_secret,"response":recaptcha_response}
         cap_server_response=requests.post(url=url,data=cap_data)
         cap_json=json.loads(cap_server_response.text)
-        print(cap_json)
         if cap_json['success']==False:
             messages.error(request,"Inavalid captcha try again")
             return redirect("adminlogin")
         if user=='admin' and password=='admin':
             request.session['username'] = user
             return redirect(admin_dashboard) 
-
         else:
             messages.info(request,'invalid credentials')
             return redirect(admin_login)
@@ -336,7 +332,7 @@ def sales_report(request):
         start_date = request.POST['start_date']
         end_date = request.POST['end_date']
         lists = []
-        orders = Order.objects.filter(date_ordered__range=[start_date, end_date], status='complete')
+        orders = Order.objects.filter(date_ordered__range=[start_date, end_date], status='complete').order_by('date_ordered')
         context = {'orders':orders}
         return render(request, 'vendor/salesreport.html',context)
     else:
@@ -346,8 +342,8 @@ def cancel_report(request):
     if request.method == 'POST':
         start_date = request.POST['start_date']
         end_date = request.POST['end_date']
-        orderdates =  Order.objects.filter(date_ordered__range=[start_date, end_date]).count()
-        pending = Order.objects.filter(date_ordered__range=[start_date, end_date], complete=True).count()
-        return render(request, 'vendor/cancelreport.html', {'orderdates':orderdates,'pending':pending})
+        orders = Order.objects.filter(date_ordered__range=[start_date, end_date], status='cancelled').order_by('date_ordered')
+        context = {'orders':orders}
+        return render(request, 'vendor/cancelreport.html',context)
     else:
         return render(request, 'vendor/cancelreport.html')
