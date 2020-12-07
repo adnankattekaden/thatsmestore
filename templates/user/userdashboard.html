@@ -2,76 +2,81 @@
 {% load static %}
 {% block content %}
 
-    <div class="dashboard-group">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="user-dt">
-                        <div class="user-img">
-                            <img src="{{img.ImageURL}}" alt="">
-                            <div class="img-add">													
-                                <input type="file" id="file">
-                                <label for="file"><i class="uil uil-camera-plus"></i></label>
+
+
+<div class="dashboard-group">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="user-dt">
+                    <div class="user-img">
+                        <img src="{{img.ImageURL}}" alt="">
+                        <div class="img-add">
+                            <input type="file" id="file">
+                            <label for="file"><i class="uil uil-camera-plus"></i></label>
+                        </div>
+                    </div>
+                    <h4>{{request.user}}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3 col-md-4">
+                <div class="left-side-tabs">
+                    <div class="dashboard-left-links">
+                        <a href="dashboard_overview.html" class="user-item active"><i
+                                class="uil uil-apps"></i>Overview</a>
+                        <a href="{% url 'edituser' %}" class="user-item"><i class="uil uil-box"></i>Profile</a>
+                        <a href="{% url 'orderhistory' %}" class="user-item"><i class="uil uil-box"></i>My Orders</a>
+                        <!-- <a href="dashboard_my_wishlist.html" class="user-item"><i class="uil uil-heart"></i>Shopping Wishlist</a> -->
+                        <a href="{% url 'myaddress' %}" class="user-item"><i class="uil uil-location-point"></i>My
+                            Address</a>
+                        <a href="{% url 'logout' %}" class="user-item"><i class="uil uil-exit"></i>Logout</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-9 col-md-8">
+                <div class="dashboard-right">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="main-title-tab">
+                                <h4><i class="uil uil-apps"></i>Overview</h4>
+                            </div>
+                            <div class="welcome-text">
+                                <h2>Hi! {{request.user}}</h2>
                             </div>
                         </div>
-                        <h4>{{request.user}}</h4>
+
+                        <div class="col-lg-6 col-md-12">
+                            <div class="pdpt-bg">
+                                <div class="pdpt-title">
+                                    <h4>My Orders</h4>
+                                </div>
+                                <div class="ddsh-body">
+                                    <h2>2 Recently Purchases</h2>
+                                    <ul class="order-list-145">
+                                        <li>
+                                            <div class="smll-history">
+
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <a href="#" class="more-link14">All Orders <i
+                                        class="uil uil-angle-double-right"></i></a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <div class="">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-3 col-md-4">
-                    <div class="left-side-tabs">
-                        <div class="dashboard-left-links">
-                            <a href="dashboard_overview.html" class="user-item active"><i class="uil uil-apps"></i>Overview</a>
-                            <a href="{% url 'edituser' %}" class="user-item"><i class="uil uil-box"></i>Profile</a>
-                            <a href="{% url 'orderhistory' %}" class="user-item"><i class="uil uil-box"></i>My Orders</a>
-                            <!-- <a href="dashboard_my_wishlist.html" class="user-item"><i class="uil uil-heart"></i>Shopping Wishlist</a> -->
-                            <a href="{% url 'myaddress' %}" class="user-item"><i class="uil uil-location-point"></i>My Address</a>
-                            <a href="{% url 'logout' %}" class="user-item"><i class="uil uil-exit"></i>Logout</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-9 col-md-8">
-                    <div class="dashboard-right">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="main-title-tab">
-                                    <h4><i class="uil uil-apps"></i>Overview</h4>
-                                </div>
-                                <div class="welcome-text">
-                                    <h2>Hi! {{request.user}}</h2>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-6 col-md-12">
-                                <div class="pdpt-bg">
-                                    <div class="pdpt-title">
-                                        <h4>My Orders</h4>
-                                    </div>
-                                    <div class="ddsh-body">
-                                        <h2>2 Recently Purchases</h2>
-                                        <ul class="order-list-145">
-                                            <li>
-                                                <div class="smll-history">
-
-                                                </div>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <a href="#" class="more-link14">All Orders <i class="uil uil-angle-double-right"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>	
-        </div>	
-    </div>	
+</div>
 
 
 {% endblock content %}
