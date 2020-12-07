@@ -264,12 +264,9 @@ def update_category(request, id):
     if request.session.has_key('username'):
         if request.method == 'POST':
             category = request.POST['category']
-            image = request.FILES['image']
 
             category_data = Category.objects.get(id=id)
             category_data.categoryname = category
-            category_data.categoryimage = image
-            category_data.image = image
             category_data.save()
             return redirect(manage_category)  
         else:

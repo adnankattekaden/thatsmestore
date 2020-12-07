@@ -14,7 +14,6 @@
     <tr>
       <th scope="col">#</th>
       <th scope="col">Category</th>
-      <th scope="col">NO: OF PRODUCTS</th>
       <th scope="col">Actions</th>
     </tr>
   </thead>
@@ -23,7 +22,6 @@
     <tr>
       <th scope="row">{{i.id}}</th>
       <td>{{i.categoryname}}</td>
-      <td></td>
       <td><a href="{% url 'editcategory' i.id %}"><input type="button" class="btn btn-info"
         value="edit"></a>&nbsp;&nbsp;<a href="{% url 'deletecategory' i.id %}"><input type="button"
         class="btn btn-primary" onclick="return confirm('Are You Sure Want To Delete')" value="Delete"></td></a>
