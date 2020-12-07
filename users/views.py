@@ -325,4 +325,7 @@ def order_history(request):
     return render(request, 'user/orderhistory.html',context)
 
 def my_address(request):
-    return render(request, 'user/myaddress.html')
+    user = request.user
+    ship = ShippingAddress.objects.filter(user=user).distinct('address')
+    context = {'ship':ship}
+    return render(request, 'user/myaddress.html',context)
