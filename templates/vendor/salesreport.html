@@ -7,8 +7,8 @@
     <form method="post">
         {% csrf_token %}
         <h3>From</h3>
-        <input type="date" id="start_date" name="start_date"><h3>TO</h3>
-        <input type="date" id="end_date" name="end_date">
+        <input type="date" id="start_date" name="start_date" required><h3>TO</h3>
+        <input type="date" id="end_date" name="end_date" required>
         <button type="submit">Submit</button>
     </form>
 </div>
@@ -17,20 +17,19 @@
     <thead>
         
         <tr>
-            <th scope="col">#</th>
             <th scope="col">Date</th>
             <th scope="col">Total Orders</th>
-            <th scope="col">Amount</th>
+            <th scope="col">Total Amount</th>
         </tr>
         
     </thead>
     <tbody>
-        {% for i in orders %}
+
+        {% for date,order in dict.items %}
         <tr>
-            <th scope="row">{{i.id}}</th>
-            <td>{{i.date_ordered}}</td>
-            <td>{{orders.count}}</td>
-            <td>${{i.get_cart_total}}</td>
+            <td>{{date}}</td>
+            <td>{{order.count}}</td>
+            <td>${{order.total}}</td>
         </tr>
         {% endfor %}
     </tbody>

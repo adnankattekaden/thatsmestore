@@ -15,7 +15,7 @@
                         <h4>My Address</h4>
                     </div>
                     <div class="address-body">
-                        <a href="#" class="add-address hover-btn" data-toggle="modal" data-target="#address_model">Add New Address</a>
+                        <!-- <a href="#" class="add-address hover-btn" data-toggle="modal" data-target="#address_model">Add New Address</a> -->
 
                         {% for i in ship %}
                         <div class="address-item">
@@ -25,10 +25,10 @@
                             <div class="address-dt-all">
                                 <h4>{{i.address}}</h4>
                                 <p>{{i.city}}, {{i.state}},{{i.country}},{{i.zipcode}}</p>
-                                <ul class="action-btns">
+                                <!-- <ul class="action-btns">
                                     <li><a href="#" class="action-btn"><i class="uil uil-edit"></i></a></li>
                                     <li><a href="#" class="action-btn"><i class="uil uil-trash-alt"></i></a></li>
-                                </ul>
+                                </ul> -->
                             </div>
                         </div>
                         {% endfor %}

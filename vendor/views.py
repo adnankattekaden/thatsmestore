@@ -2,12 +2,13 @@ import base64
 import json
 from tabnanny import check
 from urllib import request
-
 import requests
 from django.contrib import messages
 from django.contrib.auth.models import User, auth
 from django.core.files.base import ContentFile
 from django.shortcuts import HttpResponse, redirect, render
+from datetime import date
+
 
 from .models import *
 from django.db.models import Sum
@@ -176,9 +177,11 @@ def create_product(request):
             description = request.POST['description']
             image = request.POST['pro_img']
             category = Category.objects.get(id=request.POST['category'])
-            format, imgstr = image.split(';base64,')
-            ext = format.split('/')[-1]
-            data = ContentFile(base64.b64decode(imgstr), name=request.user.username + '.' + ext)
+            if image is not '':
+                format, imgstr = image.split(';base64,')
+                ext = format.split('/')[-1]
+                data = ContentFile(base64.b64decode(imgstr), name=request.user.username + '.' + ext)
+                
             product_data = Product.objects.create(productname=productname,price=price,stock=stock,description=description,category=category,image=data)
             product_data.save()
             messages.info(request,'Product Created')
@@ -206,20 +209,23 @@ def update_product(request, id):
             image = request.POST['pro_img']
             description = request.POST['description']
             category = Category.objects.get(id=request.POST['category'])
-            format, imgstr = image.split(';base64,')
-            ext = format.split('/')[-1]
-            data = ContentFile(base64.b64decode(imgstr), name=request.user.username + '.' + ext)
+            
 
             product_data = Product.objects.get(id=id)
-            
             product_data.productname = productname
             product_data.price = price
             product_data.stock = stock
-            product_data.image = data
             product_data.description = description
             product_data.category = category
+
+            if image is not '':
+                format, imgstr = image.split(';base64,')
+                ext = format.split('/')[-1]
+                data = ContentFile(base64.b64decode(imgstr), name=request.user.username + '.' + ext)
+                product_data.image = data
+
             product_data.save()
-            return redirect(admin_dashboard)  
+            return redirect(manage_product)  
         else:
             return render(request, 'vendor/updateproduct.html')
     else:
@@ -264,7 +270,6 @@ def update_category(request, id):
     if request.session.has_key('username'):
         if request.method == 'POST':
             category = request.POST['category']
-
             category_data = Category.objects.get(id=id)
             category_data.categoryname = category
             category_data.save()
@@ -276,8 +281,8 @@ def update_category(request, id):
 
 def delete_category(request,id):
     if request.session.has_key('username'):
-        u = Category.objects.get(id=id)
-        u.delete()
+        deletecategory = Category.objects.get(id=id)
+        deletecategory.delete()
         return redirect(manage_category)
     else:
         return redirect(admin_login)
@@ -322,25 +327,80 @@ def report(request):
         context =  {'complete':complete,'pending':pending,'canceled':canceled}
         return render(request, 'vendor/report.html',context)
     else:
-        return render(request, 'vendor/report.html')
+        today = date.today()
+        complete =  Order.objects.filter(date_ordered = today, status='complete').count()
+        pending = Order.objects.filter(date_ordered = today, status='pending').count()
+        canceled = Order.objects.filter(status='cancelled').count()
+        context =  {'complete':complete,'pending':pending,'canceled':canceled}
+        return render(request, 'vendor/report.html',context)
 
 def sales_report(request):
+    
     if request.method == 'POST':
         start_date = request.POST['start_date']
         end_date = request.POST['end_date']
-        lists = []
         orders = Order.objects.filter(date_ordered__range=[start_date, end_date], status='complete').order_by('date_ordered')
-        context = {'orders':orders}
+        dict = {}
+        count = 1
+        for order in orders:
+            if not order.date_ordered in dict.keys():
+                dict[order.date_ordered] = order
+                dict[order.date_ordered].total= order.get_cart_total
+                dict[order.date_ordered].count= count
+                print(order.get_cart_total)
+            else:
+                dict[order.date_ordered].total += order.get_cart_total
+                dict[order.date_ordered].count += count
+        context = {'dict':dict}
         return render(request, 'vendor/salesreport.html',context)
     else:
-        return render(request, 'vendor/salesreport.html')
+        today = date.today()
+        orders = Order.objects.filter(date_ordered=today, status='complete').order_by('date_ordered')
+        dict = {}
+        count = 1
+        for order in orders:
+            if not order.date_ordered in dict.keys():
+                dict[order.date_ordered] = order
+                dict[order.date_ordered].total= order.get_cart_total
+                dict[order.date_ordered].count= count
+            else:
+                dict[order.date_ordered].total += order.get_cart_total
+                dict[order.date_ordered].count += count
+        context = {'dict':dict}
+        return render(request, 'vendor/salesreport.html',context)
 
 def cancel_report(request):
     if request.method == 'POST':
         start_date = request.POST['start_date']
         end_date = request.POST['end_date']
         orders = Order.objects.filter(date_ordered__range=[start_date, end_date], status='cancelled').order_by('date_ordered')
-        context = {'orders':orders}
+        dict = {}
+        count = 1
+        for order in orders:
+            if not order.date_ordered in dict.keys():
+                dict[order.date_ordered] = order
+                dict[order.date_ordered].total= order.get_cart_total
+                dict[order.date_ordered].count= count
+                print(order.get_cart_total)
+            else:
+                dict[order.date_ordered].total += order.get_cart_total
+                dict[order.date_ordered].count += count
+        context = {'dict':dict}
         return render(request, 'vendor/cancelreport.html',context)
     else:
-        return render(request, 'vendor/cancelreport.html')
+        today = date.today()
+        orders = Order.objects.filter(date_ordered=today, status='cancelled').order_by('date_ordered')
+        print(orders)
+        dict = {}
+        count = 1
+        for order in orders:
+            if not order.date_ordered in dict.keys():
+                dict[order.date_ordered] = order
+                dict[order.date_ordered].total= order.get_cart_total
+                dict[order.date_ordered].count= count
+                print(order.get_cart_total)
+            else:
+                dict[order.date_ordered].total += order.get_cart_total
+                dict[order.date_ordered].count += count
+        context = {'dict':dict}
+        return render(request, 'vendor/cancelreport.html',context)

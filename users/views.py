@@ -10,8 +10,8 @@ from django.views.decorators.csrf import csrf_exempt
 import requests
 import base64
 from django.core.files.base import ContentFile
-#starts 
 
+#starts 
 def user_signup(request):
     if request.method == 'POST':
         first_name = request.POST['firstname']
@@ -142,7 +142,6 @@ def index(request):
         order, created = Order.objects.get_or_create(user=user, complete=False)
         items = order.orderitem_set.all()
         cartitems = order.get_cart_items
-
     else:
         items = []
         order = {'get_cart_total':0,'get_cart_items':0} 
@@ -160,7 +159,7 @@ def category(request, id):
     context = {'product':product,'category':category}
     return render(request,'user/category.html',context)
 
-def store(request):
+def view_store(request):
     if request.user.is_authenticated:
         user = request.user
         order, created = Order.objects.get_or_create(user=user, complete=False)
@@ -176,7 +175,7 @@ def store(request):
     return render(request, 'user/store.html',context)
 
 
-def cart(request):
+def view_cart(request):
     if request.user.is_authenticated:
         user = request.user
         order, created = Order.objects.get_or_create(user=user, complete=False)
@@ -247,7 +246,6 @@ def process_order(request):
 
         ShippingAddress.objects.create(user=user,order=order,address=data['shipping']['address'],city=data['shipping']['city'],state=data['shipping']['state'],zipcode=data['shipping']['zipcode'],country=data['shipping']['country'],payment_status=data['shipping']['payment_status'])
         add = 'itemsaved'
-       
     else:
         print('user not logged in')
     return JsonResponse(add, safe=False)
@@ -287,11 +285,6 @@ def update_profile(request, id):
             email = request.POST['email']
             image = request.POST['pro_img']
 
-            format, imgstr = image.split(';base64,')
-            ext = format.split('/')[-1]
-
-            data = ContentFile(base64.b64decode(imgstr), name=request.user.username + '.' + ext)
-
             user_data = User.objects.get(id=id)
             user_data.first_name = first_name
             user_data.last_name = last_name
@@ -302,9 +295,13 @@ def update_profile(request, id):
             user=request.user
             if Userdetails.objects.filter(user_id=user).exists():
                 img = Userdetails.objects.get(user_id=user)
-                if image is not None:
-                    img.image = data
-                    img.save()
+                if image is not '':
+                    format, imgstr = image.split(';base64,')
+                    ext = format.split('/')[-1]
+                    data = ContentFile(base64.b64decode(imgstr), name=request.user.username + '.' + ext)
+                    if image is not None:
+                        img.image = data
+                        img.save()
             else:
                 if image is not None:
                     img = Userdetails.objects.create(image=data, user_id=user)
@@ -316,11 +313,7 @@ def update_profile(request, id):
 
 def order_history(request):
     user = request.user
-    orders = Order.objects.filter(user=user, complete=True)
-    # for order in orders:
-    #     orderItems = OrderItem.objects.filter(order=order)
-    #     for orderItem in orderItems:
-    #         items.append(orderItem)   
+    orders = Order.objects.filter(user=user, complete=True) 
     context = {'orders':orders}
     return render(request, 'user/orderhistory.html',context)
 

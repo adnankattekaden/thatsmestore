@@ -16,9 +16,9 @@
     <form method="post">
         {% csrf_token %}
         <h3>From</h3>
-        <input type="date" id="start_date" name="start_date">
+        <input type="date" id="start_date" name="start_date" required>
         <h3>TO</h3>
-        <input type="date" id="end_date" name="end_date">
+        <input type="date" id="end_date" name="end_date" required>
         <button type="submit">SUbmit</button>
     </form>
 
