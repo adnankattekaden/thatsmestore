@@ -293,6 +293,7 @@ def update_profile(request, id):
             user_data.save()
 
             user=request.user
+            
             if Userdetails.objects.filter(user_id=user).exists():
                 img = Userdetails.objects.get(user_id=user)
                 if image is not '':

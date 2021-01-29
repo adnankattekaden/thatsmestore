@@ -81,12 +81,11 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'avengers',
-        'USER': 'postgres',
+        'USER': 'jhon',
         'PASSWORD': '1234',
         'HOST': 'localhost'
     }
 }
-
 
 
 # Password validation
