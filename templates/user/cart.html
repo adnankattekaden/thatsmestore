@@ -128,11 +128,13 @@ h1,h2,h3,h4,h5,h6{
 
         <div class="box-element">
             <div class="cart-row">
-                <div style="flex:2"></div>
-                <div style="flex:2"><h5></h5><strong>Item</strong></div>
+                <div style="flex:2"><strong>Product</strong></div>
+                <div style="flex:2"><strong>Item</strong></div>
                 <div style="flex:1"><strong>Price</strong></div>
                 <div style="flex:1"><strong>Quantity</strong></div>
                 <div style="flex:1"><strong>Total</strong></div>
+                <div style="flex:1"><strong>Action</strong></div>
+
             </div>
             {% for item in items %}
             <div class="cart-row">
@@ -143,11 +145,13 @@ h1,h2,h3,h4,h5,h6{
                     <p class="quantity">{{item.quantity}}</p>
                     <div class="quantity">
                         <img data-product="{{item.product.id}}" data-action="add" class="chg-quantity update-cart" src="{% static 'userpanel/img/arrowup.png' %}" alt="">
-
                         <img data-product="{{item.product.id}}" data-action="remove" class="chg-quantity update-cart"  src="{% static 'userpanel/img/arrowdown.png' %}" alt="">
                     </div>
                 </div>
                 <div style="flex:1"><p>${{item.get_total}}</p></div>
+                <div style="flex:1">
+                    <p><img data-product="{{item.product.id}}" data-action="delete" class="chg-quantity update-cart"  src="{% static 'userpanel/img/delete.png' %}" alt=""></p>
+                </div>
             </div>
             {% endfor %}
             
