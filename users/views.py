@@ -279,7 +279,7 @@ def edit_user(request):
 def update_profile(request, id):
     if request.user.is_authenticated:
         if request.method == 'POST':
-            first_name = request.POST['firstname']
+            first_name = request.POST['fullname']
             last_name = request.POST['lastname']
             username = request.POST['username']
             email = request.POST['email']
@@ -300,11 +300,13 @@ def update_profile(request, id):
                     format, imgstr = image.split(';base64,')
                     ext = format.split('/')[-1]
                     data = ContentFile(base64.b64decode(imgstr), name=request.user.username + '.' + ext)
-                    if image is not None:
-                        img.image = data
-                        img.save()
+                    img.image = data
+                    img.save()
             else:
                 if image is not None:
+                    format, imgstr = image.split(';base64,')
+                    ext = format.split('/')[-1]
+                    data = ContentFile(base64.b64decode(imgstr), name=request.user.username + '.' + ext)
                     img = Userdetails.objects.create(image=data, user_id=user)
             return redirect(edit_user)
         else:
@@ -314,7 +316,7 @@ def update_profile(request, id):
 
 def order_history(request):
     user = request.user
-    orders = Order.objects.filter(user=user, complete=True) 
+    orders = Order.objects.filter(user=user, complete=True).order_by('date_ordered')
     context = {'orders':orders}
     return render(request, 'user/orderhistory.html',context)
 

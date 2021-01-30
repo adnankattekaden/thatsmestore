@@ -2,33 +2,16 @@
 {% load static %}
 {% block content %}
 
-<style>
-    .hidden {
-        display: none !important;
-    }
-</style>
-
 
 <div style="float: right;" class="col-lg-5">
-
-
     <div class="user-img">
-        <img src="{{img.ImageURL}}" alt="">
-        <div class="img-add">													
-            <input type="file" id="file">
+        <img id="cropped" class="cropped" src="{{img.ImageURL}}" alt="">
+        <div class="img-add">
+            <input type="file" id="file" accept="image/*">
             <label for="file"><i class="uil uil-camera-plus"></i></label>
         </div>
     </div>
-
-    <div class="box-2">
-        <div class="result"></div>
-    </div>
-
-    <button style="right: auto;" type="button" id="load" class="btn save btn-primary hidden">Save changes</button>
-
 </div>
-
-
 
 
 <div style="float: left;" class="col-lg-7">
@@ -46,7 +29,7 @@
             </div>
 
             <div class="form-group">
-                <input type="text" class="form-control" id="name" name="Fullname" placeholder="Full Name"
+                <input type="text" class="form-control" id="name" name="fullname" placeholder="Full Name"
                     value="{{con.first_name}}" required>
             </div>
             <div class="form-group">
@@ -64,16 +47,10 @@
                     value="{{con.email}}" required>
             </div>
 
-            <!-- button for adding img -->
-            <div class="input-group form-group">
-                <button type="button" class="btn btn-primary hidden" id="img-button">Upload Image</button>
-            </div>
-
-            <!-- result of cropped img -->
-            <img id="cropped" class="cropped" src="">
 
             <!-- hidden field -->
-            <input class="d-none" type="file" id="file-input">
+            <input class="d-none" type="file" id="file-input"  accept="image/*"> 
+
             <textarea name="pro_img" class="d-none" id="imageBaseData"></textarea>
 
             <button class="login-btn hover-btn" type="submit">Update</button>
@@ -81,69 +58,91 @@
     </div>
 
 
-    <div class="box-2">
-        <div class="result"></div>
+
+
+<button type="button" id="show-modal" class="btn btn-primary d-none" data-toggle="modal" data-target="#exampleModal">
+    Launch demo modal
+  </button>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Crop Image</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                    <div class="result" style="width: 30px; height: 30px;"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" id="load" class="btn save btn-primary" data-dismiss="modal">Save changes</button>
+            </div>
+        </div>
     </div>
+</div>
 
 
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/0.8.1/cropper.min.js"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/0.8.1/cropper.min.js"></script>
+<script>
 
-    <script>
-        
-        $("#file").click(function (e) {
-            document.getElementById('load').classList.remove('hidden')
-            $("#file-input").click();
-        });
-    
+    $("#file").click(function (e) {
+        document.getElementById('load').classList.remove('hidden')
 
-        $("#img-button").click(function (e) {
-            $("#file-input").click();
-        });
+        $("#file-input").click();
+    });
 
-        let result = document.querySelector('.result'),
-            save = document.querySelector('.save'),
-            cropped = document.querySelector('.cropped'),
-            upload = document.querySelector('#file-input'),
-            cropper = '';
+    $("#file-input").click(function (e) {
+        $("#show-modal").click();
+    });
 
-        upload.addEventListener('change', (e) => {
-            if (e.target.files.length) {
-                // start file reader
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    if (e.target.result) {
-                        // create new image
-                        // $("#exampleModalCenter").modal("show");
-                        let img = document.createElement('img');
-                        img.id = 'image';
-                        img.src = e.target.result
-                        // clean result before
-                        result.innerHTML = '';
-                        // append new image
-                        result.appendChild(img);
-                        // init cropper
-                        cropper = new Cropper(img);
-                    }
-                };
-                reader.readAsDataURL(e.target.files[0]);
-            }
-        });
+    let result = document.querySelector('.result'),
+        save = document.querySelector('.save'),
+        cropped = document.querySelector('.cropped'),
+        upload = document.querySelector('#file-input'),
+        cropper = '';
 
-        save.addEventListener('click', (e) => {
-            e.preventDefault();
-            // get result to data uri
-            let imgSrc = cropper.getCroppedCanvas({
-                width: 300 // img disp value
-            }).toDataURL();
-            // $("#exampleModalCenter").modal("hide");
-            cropped.src = imgSrc;
-            $('#imageBaseData').val(imgSrc)
-        });
+    upload.addEventListener('change', (e) => {
+        if (e.target.files.length) {
+            // start file reader
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                if (e.target.result) {
+                    // create new image
+                    // $("#exampleModalCenter").modal("show");
+                    let img = document.createElement('img');
+                    img.id = 'image';
+                    img.src = e.target.result
+                    // clean result before
+                    result.innerHTML = '';
+                    // append new image
+                    result.appendChild(img);
+                    // init cropper
+                    cropper = new Cropper(img);
+                }
+            };
+            reader.readAsDataURL(e.target.files[0]);
+        }
+    });
 
-    </script>
+    save.addEventListener('click', (e) => {
+        e.preventDefault();
+        // get result to data uri
+        let imgSrc = cropper.getCroppedCanvas({
+            width: 300 // img disp value
+        }).toDataURL();
+        // $("#exampleModalCenter").modal("hide");
+        cropped.src = imgSrc;
+        $('#imageBaseData').val(imgSrc)
+    });
 
+</script>
 
 </div>
 
