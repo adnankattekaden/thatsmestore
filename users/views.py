@@ -172,7 +172,7 @@ def category(request, id):
         category = Category.objects.all()
         product = Product.objects.filter(category=id)
         img = {'':''}
-        cartitems = {'':''}
+        cartitems = '0'
     context = {'product':product,'category':category,'img':img,'cartitems':cartitems}
     return render(request,'user/category.html',context)
 
@@ -303,7 +303,7 @@ def product_view(request,id):
     else:
         products = Product.objects.get(id=id)
         img = {'':''}
-        cartitems = {'':''}
+        cartitems = '0'
     context = {'products':products,'img':img,'cartitems':cartitems}
     return render(request, 'user/productviewpage.html',context)
 
