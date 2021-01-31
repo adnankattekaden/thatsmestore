@@ -310,7 +310,10 @@ def product_view(request,id):
 def dashboard_overview(request):
     if request.user.is_authenticated:
         user = request.user
-        img=Userdetails.objects.get(user_id=user)
+        try:
+            img=Userdetails.objects.get(user_id=user)
+        except:
+            img = {'':''}
         order, created = Order.objects.get_or_create(user=user, complete=False)
         items = order.orderitem_set.all()
         cartitems = order.get_cart_items
