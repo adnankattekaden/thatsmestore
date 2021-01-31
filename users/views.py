@@ -137,26 +137,43 @@ def verify_otp(request):
 
 #corestuffs
 def index(request):
+    user = request.user
     if request.user.is_authenticated:
-        user = request.user
         order, created = Order.objects.get_or_create(user=user, complete=False)
         items = order.orderitem_set.all()
         cartitems = order.get_cart_items
+        try:
+            img=Userdetails.objects.get(user_id=user)
+        except:
+            img = {'':''}
     else:
         items = []
         order = {'get_cart_total':0,'get_cart_items':0} 
         cartitems = order['get_cart_items']
-
+        img = {'':''}
     category = Category.objects.all()
     products = Product.objects.all()
-    context = {'products':products,'cartitems':cartitems,'category':category}
+    context = {'products':products,'cartitems':cartitems,'category':category,'img':img}
     return render(request, 'user/index.html',context)
 
 def category(request, id):
-    product = Product.objects.filter(category=id)
-    category = Category.objects.all()
-    
-    context = {'product':product,'category':category}
+    if request.user.is_authenticated:
+        user = request.user
+        product = Product.objects.filter(category=id)
+        category = Category.objects.all()
+        order, created = Order.objects.get_or_create(user=user, complete=False)
+        items = order.orderitem_set.all()
+        cartitems = order.get_cart_items
+        try:
+            img=Userdetails.objects.get(user_id=user)
+        except:
+            img = {'':''}
+    else:
+        category = Category.objects.all()
+        product = Product.objects.filter(category=id)
+        img = {'':''}
+        cartitems = {'':''}
+    context = {'product':product,'category':category,'img':img,'cartitems':cartitems}
     return render(request,'user/category.html',context)
 
 def view_store(request):
@@ -165,13 +182,17 @@ def view_store(request):
         order, created = Order.objects.get_or_create(user=user, complete=False)
         items = order.orderitem_set.all()
         cartitems = order.get_cart_items
+        try:
+            img=Userdetails.objects.get(user_id=user)
+        except:
+            img = {'':''}
     else:
         items = []
         order = {'get_cart_total':0,'get_cart_items':0} 
         cartitems = order['get_cart_items']
-
+        img = {'':''}
     products = Product.objects.all()
-    context = {'products':products,'cartitems':cartitems}
+    context = {'products':products,'cartitems':cartitems,'img':img}
     return render(request, 'user/store.html',context)
 
 
@@ -181,15 +202,20 @@ def view_cart(request):
         order, created = Order.objects.get_or_create(user=user, complete=False)
         items = order.orderitem_set.all()
         cartitems = order.get_cart_items
+        try:
+            img=Userdetails.objects.get(user_id=user)
+        except:
+            img = {'':''}
     else:
         items = []
         order = {'get_cart_total':0,'get_cart_items':0}
         cartitems = order['get_cart_items']
-    context = {'items':items,'order':order,'cartitems':cartitems}
+        img = {'':''}
+    context = {'items':items,'order':order,'cartitems':cartitems,'img':img}
     return render(request, 'user/cart.html',context)
 
 def checkout(request):
-    if request.user.is_authenticated:
+    if request.user.is_authenticated:  
         user = request.user
         order, created = Order.objects.get_or_create(user=user, complete=False)
         items = order.orderitem_set.all()
@@ -204,11 +230,18 @@ def checkout(request):
         response = client.order.create(dict(amount=order_amount,currency=order_currency,receipt=order_receipt,notes=notes,payment_capture='0'))
         order_id = response['id']
         order_status = response['status']
+        try:
+            img=Userdetails.objects.get(user_id=user)
+        except:
+            img = {'':''}
     else:
         items = []
         order = {'get_cart_total':0,'get_cart_items':0} 
         cartitems = order['get_cart_items']
-    context = {'items':items,'order':order,'cartitems':cartitems, 'ship':ship,'order_id':order_id}
+        img = {'':''}
+        ship = {'':''}
+        order_id = {'':''}
+    context = {'items':items,'order':order,'cartitems':cartitems, 'ship':ship,'order_id':order_id,'img':img}
     return render(request, 'user/checkout.html',context)
 
 
@@ -257,15 +290,31 @@ def process_order(request):
 #additional
 
 def product_view(request,id):
-    products = Product.objects.get(id=id)
-    context = {'products':products}
+    if request.user.is_authenticated:
+        user = request.user
+        products = Product.objects.get(id=id)
+        order, created = Order.objects.get_or_create(user=user, complete=False)
+        items = order.orderitem_set.all()
+        cartitems = order.get_cart_items
+        try:
+            img=Userdetails.objects.get(user_id=user)
+        except:
+            img = {'':''}
+    else:
+        products = Product.objects.get(id=id)
+        img = {'':''}
+        cartitems = {'':''}
+    context = {'products':products,'img':img,'cartitems':cartitems}
     return render(request, 'user/productviewpage.html',context)
 
 def dashboard_overview(request):
-    user = request.user
-    if Userdetails.objects.filter(user_id=user).exists():
+    if request.user.is_authenticated:
+        user = request.user
         img=Userdetails.objects.get(user_id=user)
-        return render(request, 'user/userdashboard.html',{'img':img})
+        order, created = Order.objects.get_or_create(user=user, complete=False)
+        items = order.orderitem_set.all()
+        cartitems = order.get_cart_items
+        return render(request, 'user/userdashboard.html',{'img':img,'cartitems':cartitems})
     else:
         return render(request, 'user/userdashboard.html')
 
@@ -273,9 +322,13 @@ def edit_user(request):
     user = request.user.id
     if Userdetails.objects.filter(user_id=user).exists():
         con = User.objects.get(id=user)
-        if Userdetails.objects.filter(user_id=user).exists():
-            img=Userdetails.objects.get(user_id=user)
-        return render(request, 'user/userprofile.html',{'con':con, 'img':img})
+        img=Userdetails.objects.get(user_id=user)
+        user=request.user
+        order, created = Order.objects.get_or_create(user=user, complete=False)
+        items = order.orderitem_set.all()
+        cartitems = order.get_cart_items
+        context = {'cartitems':cartitems,'con':con, 'img':img}
+        return render(request, 'user/userprofile.html',context)
     else:
         con = User.objects.get(id=user)
         return render(request, 'user/userprofile.html',{'con':con})
@@ -296,8 +349,7 @@ def update_profile(request, id):
             user_data.email = email
             user_data.save()
 
-            user=request.user
-            
+            user = request.user
             if Userdetails.objects.filter(user_id=user).exists():
                 img = Userdetails.objects.get(user_id=user)
                 if image is not '':
@@ -314,18 +366,35 @@ def update_profile(request, id):
                     img = Userdetails.objects.create(image=data, user_id=user)
             return redirect(edit_user)
         else:
-            return render(request, 'user/userprofile.html')
+            return render(request, 'user/userprofile.html',)
     else:
         return redirect(index)
 
 def order_history(request):
     user = request.user
     orders = Order.objects.filter(user=user, complete=True).order_by('date_ordered')
-    context = {'orders':orders}
+    if Userdetails.objects.filter(user_id=user).exists():
+        img=Userdetails.objects.get(user_id=user)
+        user=request.user
+        order, created = Order.objects.get_or_create(user=user, complete=False)
+        items = order.orderitem_set.all()
+        cartitems = order.get_cart_items
+        context = {'orders':orders,'img':img,'cartitems':cartitems}
+    else:
+        context = {'orders':orders}
+
     return render(request, 'user/orderhistory.html',context)
 
 def my_address(request):
     user = request.user
     ship = ShippingAddress.objects.filter(user=user).distinct('address')
-    context = {'ship':ship}
+    if Userdetails.objects.filter(user_id=user).exists():
+        img=Userdetails.objects.get(user_id=user)
+        user=request.user
+        order, created = Order.objects.get_or_create(user=user, complete=False)
+        items = order.orderitem_set.all()
+        cartitems = order.get_cart_items
+        context = {'ship':ship,'img':img,'cartitems':cartitems}
+    else:
+        context = {'ship':ship}
     return render(request, 'user/myaddress.html',context)

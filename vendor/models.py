@@ -39,7 +39,7 @@ class Product(models.Model):
         return url
 
 class Userdetails(models.Model):
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    user_id = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     image = models.ImageField(null=True,blank=True,upload_to='userdata/images')
     mobile_number = models.CharField(user_id, max_length=10, null=True, blank=True)
 
